@@ -89,5 +89,6 @@ workers.emplace_back("Доктор Айболит", 80, WorkerRole::VETERINAR);
 g++ -std=c++17 -o ZooGame main.cpp
 ```
 
+![image](https://github.com/user-attachments/assets/3b2e8488-dbbe-4b89-94b0-fde9dd2aa9b3)
 
 
