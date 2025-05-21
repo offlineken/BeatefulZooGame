@@ -1,0 +1,38 @@
+# Compiled binaries
+*.exe
+*.out
+*.obj
+*.o
+*.dll
+*.lib
+*.a
+
+# Build directories
+build/
+cmake-build-*/
+Debug/
+Release/
+
+# IDE files
+.vs/
+.idea/
+*.suo
+*.user
+*.userossc
+*.sdf
+*.opensdf
+*.VC.db
+*.VC.opendb
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# OS generated files
+desktop.ini
+$RECYCLE.BIN/
+System Volume Information/
