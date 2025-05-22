@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <vector>
 #include <string>
 #include <ctime>
@@ -14,30 +14,30 @@
 
 using namespace std;
 
-// Константы
-const int MAX_EMPLOYEES = 5;
-const int BASE_FOOD_COST = 5;
-const int BASE_ENCLOSURE_COST = 500;
-const int BASE_ANIMAL_PRICE = 2000;
-const int ADVERTISEMENT_COST = 1000;
-const int MAX_POPULARITY = 100;
-const int MAX_AGE = 2000;
-const int OLD_AGE_THRESHOLD = 1000;
-const int BREEDING_ENCLOSURE_COST = 800;
+// Константы игры
+const int MAX_EMPLOYEES = 5;          // Максимальное количество сотрудников
+const int BASE_FOOD_COST = 5;         // Базовая стоимость единицы еды
+const int BASE_ENCLOSURE_COST = 500;   // Базовая стоимость вольера
+const int BASE_ANIMAL_PRICE = 2000;    // Базовая цена животного
+const int ADVERTISEMENT_COST = 1000;   // Стоимость рекламы
+const int MAX_POPULARITY = 100;        // Максимальная популярность
+const int MAX_AGE = 2000;              // Максимальный возраст животного
+const int OLD_AGE_THRESHOLD = 1000;    // Порог старости животного
+const int BREEDING_ENCLOSURE_COST = 800; // Стоимость вольера для размножения
 
-// Перечисления
-enum class Diet { PREDATORS, HERBIVORES };
-enum class Climate { CONTINENT, TROPIC, ARCTIC };
-enum class WorkerRole { DIRECTOR, VETERINAR, CLEANER, FOODMEN };
-enum class AnimalState { HEALTHY, SICK, DEAD };
+// Перечисления для типов данных
+enum class Diet { PREDATORS, HERBIVORES };    // Тип питания: хищники/травоядные
+enum class Climate { CONTINENT, TROPIC, ARCTIC }; // Климат: континентальный/тропический/арктический
+enum class WorkerRole { DIRECTOR, VETERINAR, CLEANER, FOODMEN }; // Роли сотрудников
+enum class AnimalState { HEALTHY, SICK, DEAD }; // Состояния животных
 
-// Структуры
+// Предварительные объявления структур
 struct Animal;
 struct Enclosure;
 struct Employee;
 struct Zoo;
 
-// Прототипы функций
+// Прототипы вспомогательных функций
 wstring chooseClimate();
 wstring chooseAnimalType();
 wstring chooseSpecificAnimal(const wstring& type);
@@ -49,43 +49,45 @@ wstring removeNonRussian(const wstring& text);
 wstring localizeText(const wstring& text);
 wstring removeExtraSpaces(const wstring& text);
 
-// Класс животного
+// Класс Animal - представляет животное в зоопарке
 class Animal {
 public:
-    // Вариант 1
-    string name;
-    int age = 0;
-    int weight = 0;
-    int price = 0;
-    Diet diet;
-    Climate climate;
-    AnimalState state;
-    int id = 0;
+    // Основные атрибуты животного (вариант 1 - для английской версии)
+    string name;        // Имя животного
+    int age = 0;        // Возраст в днях
+    int weight = 0;     // Вес в кг
+    int price = 0;      // Цена животного
+    Diet diet;          // Тип питания (хищник/травоядное)
+    Climate climate;    // Предпочитаемый климат
+    AnimalState state;  // Состояние здоровья
+    int id = 0;         // Уникальный идентификатор
 
-    // Вариант 2
-    wstring wname;
-    wstring type;
-    wstring specificType;
-    bool isPredator = false;
-    bool isSick = false;
-    bool isHungry = false;
-    bool isUnhappy = false;
-    int happiness = 50; // 0-100, где 100 - полностью счастливо
-    wchar_t gender = 'M'; // 'M' или 'F'
-    Animal* parent1 = nullptr;
-    Animal* parent2 = nullptr;
-    bool bornInZoo = false;
+    // Дополнительные атрибуты (вариант 2 - для локализованной версии)
+    wstring wname;      // Имя животного (unicode)
+    wstring type;       // Общий тип (кошачьи, псовые и т.д.)
+    wstring specificType; // Конкретный вид (лев, тигр и т.д.)
+    bool isPredator = false; // Является ли хищником
+    bool isSick = false;     // Болен ли
+    bool isHungry = false;   // Голоден ли
+    bool isUnhappy = false;  // Несчастлив ли
+    int happiness = 50;      // Уровень счастья (0-100)
+    wchar_t gender = 'M';    // Пол ('M' или 'F')
+    Animal* parent1 = nullptr; // Указатель на первого родителя
+    Animal* parent2 = nullptr; // Указатель на второго родителя
+    bool bornInZoo = false;  // Родилось ли в зоопарке
 
-    // Конструкторы
+    // Конструктор с параметрами
     Animal(string _name, int _age, int _weight, int _price, Diet _diet, Climate _climate, AnimalState _state, int _id) :
         name(_name), age(_age), weight(_weight), price(_price), diet(_diet), climate(_climate), state(_state), id(_id),
         parent1(nullptr), parent2(nullptr), bornInZoo(false) {
     }
 
+    // Конструктор по умолчанию
     Animal() : parent1(nullptr), parent2(nullptr), bornInZoo(false) {}
 
-    // Методы
+    // Метод обновления состояния животного
     void update() {
+        // Случайное заболевание животного с вероятностью 10%
         if (rand() % 10 == 0) {
             state = AnimalState::SICK;
         }
@@ -93,6 +95,7 @@ public:
 
     // Оператор для размножения животных
     Animal operator+(Animal& other) {
+        // Проверка совместимости животных для размножения
         if (this->gender == other.gender) {
             throw runtime_error("Должен быть разный гендр");
         }
@@ -100,6 +103,7 @@ public:
             throw runtime_error("Слишком молодые (должно быть возрасть больше 5 дн)");
         }
 
+        // Создание потомка
         Animal offspring;
         offspring.type = this->type;
         offspring.specificType = this->specificType;
@@ -109,18 +113,20 @@ public:
         offspring.isPredator = this->isPredator;
         offspring.happiness = 100;
         offspring.gender = (rand() % 2 == 0) ? 'M' : 'F';
+        
+        // Сохранение информации о родителях
         offspring.parent1 = new Animal(*this);
         offspring.parent2 = new Animal(other);
         offspring.bornInZoo = true;
 
-        // Генерация имени
+        // Генерация имени для потомка
         wstring names[] = { L"Малыш", L"Кроха", L"Детка", L"Малышка", L"Крошка" };
         offspring.wname = names[rand() % 5] + L" " + this->wname + L" и " + other.wname;
 
         return offspring;
     }
 
-    // Деструктор
+    // Деструктор - освобождает память от родителей, если животное родилось в зоопарке
     ~Animal() {
         if (bornInZoo) {
             delete parent1;
@@ -129,45 +135,51 @@ public:
     }
 };
 
-// Класс вольера
+// Класс Enclosure - представляет вольер для животных
 class Enclosure {
 public:
-    // Вариант 1
-    int capacity = 0;
-    Climate climate;
-    vector<Animal> animals;
-    int dirty = 0; // загрязнение вольера
+    // Основные атрибуты вольера (вариант 1)
+    int capacity = 0;           // Вместимость вольера
+    Climate climate;            // Климат вольера
+    vector<Animal> animals;     // Животные в вольере
+    int dirty = 0;              // Уровень загрязнения
 
-    // Вариант 2
-    string name;
-    wstring animalType;
-    wstring specificAnimalType;
-    int dailyCost = 50;
-    bool isPredatorEnclosure = false;
-    bool isBreedingEnclosure = false;
-    int upgradeLevel = 1;
-    bool isDirty = false;
+    // Дополнительные атрибуты (вариант 2)
+    string name;                // Название вольера
+    wstring animalType;         // Тип животных
+    wstring specificAnimalType; // Конкретный вид животных
+    int dailyCost = 50;         // Ежедневные расходы
+    bool isPredatorEnclosure = false; // Для хищников ли
+    bool isBreedingEnclosure = false; // Для размножения ли
+    int upgradeLevel = 1;       // Уровень улучшения
+    bool isDirty = false;       // Грязный ли
 
-    // Конструкторы
+    // Конструктор с параметрами
     Enclosure(int _capacity, Climate _climate) :
         capacity(_capacity), climate(_climate), dirty(0),
         isDirty(false), upgradeLevel(1) {
     }
 
+    // Конструктор по умолчанию
     Enclosure() : capacity(0), dirty(0), dailyCost(50),
         isPredatorEnclosure(false), isBreedingEnclosure(false),
         upgradeLevel(1), isDirty(false) {
     }
 
-    // Методы
+    // Метод добавления животного в вольер
     bool addAnimal(const Animal& animal) {
+        // Проверка на переполнение вольера
         if (animals.size() >= capacity) return false;
+        // Проверка совместимости по типу питания
         if (!animals.empty() && animal.diet != animals[0].diet) return false;
+        // Проверка совместимости по климату
         if (animal.climate != climate) return false;
+        
         animals.push_back(animal);
         return true;
     }
 
+    // Метод продажи животного по ID
     void sellAnimal(int id) {
         for (size_t i = 0; i < animals.size(); i++) {
             if (animals[i].id == id) {
@@ -177,18 +189,23 @@ public:
         }
     }
 
+    // Проверка, нужна ли уборка вольера
     bool needsCleaning() {
         return dirty > 5;
     }
 
+    // Метод уборки вольера
     void clean() {
         dirty = 0;
         isDirty = false;
     }
 
+    // Метод обновления состояния вольера
     void update() {
+        // Увеличение уровня загрязнения
         dirty += 2;
 
+        // Подсчет животных и больных животных
         int totalAnimal = 0;
         int totalSickAnimal = 0;
         for (auto& animal : animals) {
@@ -196,6 +213,7 @@ public:
             totalSickAnimal += (animal.state == AnimalState::SICK) ? 1 : 0;
         }
 
+        // Распространение болезни, если есть больные животные
         if (totalSickAnimal) {
             for (int i = 0; i < 2; i++) {
                 for (auto& animal : animals) {
@@ -209,63 +227,65 @@ public:
     }
 };
 
-// Класс работника
+// Класс Employee - представляет сотрудника зоопарка
 class Employee {
 public:
-    // Вариант 1
-    string name;
-    int price = 0;
-    WorkerRole role;
-    bool tired = false;
+    // Основные атрибуты (вариант 1)
+    string name;        // Имя сотрудника
+    int price = 0;      // Зарплата
+    WorkerRole role;    // Должность
+    bool tired = false; // Устал ли
 
-    // Вариант 2
-    wstring wname;
-    wstring position;
-    int salary = 0;
-    int efficiency = 0;
+    // Дополнительные атрибуты (вариант 2)
+    wstring wname;      // Имя (unicode)
+    wstring position;   // Должность
+    int salary = 0;     // Зарплата
+    int efficiency = 0; // Эффективность
 
-    // Конструкторы
+    // Конструктор с параметрами
     Employee(string _name, int _price, WorkerRole _role) :
         name(_name), price(_price), role(_role), tired(false) {
     }
 
+    // Конструктор по умолчанию
     Employee() : price(0), tired(false), salary(0), efficiency(0) {}
 
-    // Методы
+    // Метод обновления состояния сотрудника
     void update() {
-        tired = false;
+        tired = false; // Сотрудник отдохнул
     }
 };
 
-// Класс зоопарка
+// Класс Zoo - основной класс, представляющий зоопарк
 class Zoo {
 public:
-    // Вариант 1
-    string name;
-    int day = 0;
-    int food = 0;
-    int money = 0;
-    int popularity = 0;
-    vector<Animal> animals;
-    vector<Employee> workers;
-    vector<Enclosure> enclosures;
+    // Основные атрибуты зоопарка (вариант 1)
+    string name;                // Название зоопарка
+    int day = 0;                // Текущий день
+    int food = 0;               // Количество еды
+    int money = 0;              // Деньги
+    int popularity = 0;         // Популярность (0-100)
+    vector<Animal> animals;     // Все животные
+    vector<Employee> workers;   // Сотрудники
+    vector<Enclosure> enclosures; // Вольеры
 
-    // Вариант 2
-    wstring wname;
-    int visitors = 0;
-    int animalsCount = 0;
-    int daysSurvived = 0;
-    bool hasPlayerTakenAction = false;
-    bool delegationSatisfied = false;
-    int daysWithoutAction = 0;
-    int animalsBoughtToday = 0;
+    // Дополнительные атрибуты (вариант 2)
+    wstring wname;              // Название (unicode)
+    int visitors = 0;           // Количество посетителей
+    int animalsCount = 0;       // Количество животных
+    int daysSurvived = 0;       // Дней выживания
+    bool hasPlayerTakenAction = false; // Игрок совершил действие
+    bool delegationSatisfied = false; // Довольна ли делегация
+    int daysWithoutAction = 0;  // Дней без действий
+    int animalsBoughtToday = 0; // Животных куплено сегодня
 
+    // Вложенная структура для магазина животных
     struct AnimalShop {
-        vector<Animal> availableAnimals;
-        int daysUntilRefresh = 0;
+        vector<Animal> availableAnimals; // Доступные животные
+        int daysUntilRefresh = 0;        // Дней до обновления
     } animalShop;
 
-    // Конструкторы
+    // Конструктор с параметрами (английская версия)
     Zoo(string _name, int start_money) :
         name(_name), day(0), food(0), money(start_money), popularity(50),
         visitors(0), animalsCount(0), daysSurvived(0),
@@ -274,9 +294,11 @@ public:
 
         animalShop.daysUntilRefresh = 0;
         refreshAnimalShop();
+        // Добавление директора по умолчанию
         workers.push_back(Employee("Директор Егор", 100, WorkerRole::DIRECTOR));
     }
 
+    // Конструктор с параметрами (локализованная версия)
     Zoo(wstring _wname) : wname(_wname), food(10), money(100000), popularity(50),
         visitors(0), animalsCount(0), daysSurvived(0), day(0),
         hasPlayerTakenAction(false), delegationSatisfied(false),
@@ -284,11 +306,12 @@ public:
 
         animalShop.daysUntilRefresh = 0;
         refreshAnimalShop();
+        // Добавление директора по умолчанию
         workers.push_back(Employee("Директор Егор", 100, WorkerRole::DIRECTOR));
         name = string(_wname.begin(), _wname.end());
     }
 
-    // Методы из первого варианта
+    // Метод получения количества больных животных
     int getCountSickAnimal() const {
         int totalSickAnimal = 0;
         for (const auto& enclosure : enclosures) {
@@ -299,6 +322,7 @@ public:
         return totalSickAnimal;
     }
 
+    // Метод получения общего количества животных
     int getCountAnimal() const {
         int totalAnimal = 0;
         for (const auto& enclosure : enclosures) {
@@ -309,6 +333,7 @@ public:
         return totalAnimal;
     }
 
+    // Метод лечения животных
     void healthingAnimal() {
         int totalSickAnimal = getCountSickAnimal();
 
@@ -317,6 +342,7 @@ public:
             return;
         }
 
+        // Лечение животных ветеринарами
         for (auto& worker : workers) {
             if (worker.role == WorkerRole::VETERINAR && !worker.tired) {
                 if (totalSickAnimal >= 20) worker.tired = true;
@@ -343,16 +369,17 @@ public:
         }
     }
 
+    // Метод перехода на следующий день
     void nextDay() {
         day++;
         daysSurvived++;
 
-        // Обновление работников
+        // Обновление состояния сотрудников
         for (auto& worker : workers) {
             worker.update();
         }
 
-        // Расходы
+        // Расчет ежедневных расходов
         int cost = 0;
         for (Employee& worker : workers) { cost += worker.price; }
         money -= cost;
@@ -369,6 +396,7 @@ public:
             wcout << L"Кормление животных: " << animals2feed << endl;
         }
         else {
+            // Животные умирают от голода с вероятностью 10%
             for (auto& animal : animals) {
                 if (rand() % 10 == 0) {
                     animal.state = AnimalState::DEAD;
@@ -377,12 +405,12 @@ public:
             wcout << L"Не хватает еды для животных!" << endl;
         }
 
-        // Обновление вольеров
+        // Обновление состояния вольеров
         for (auto& enclosure : enclosures) {
             enclosure.update();
         }
 
-        // Уборка
+        // Уборка вольеров
         int cleanerCount = 0;
         int dirtyZoo = 0;
         for (Employee& worker : workers) {
@@ -413,6 +441,7 @@ public:
                 *sickAnimal += (animal.state == AnimalState::SICK) ? 1 : 0;
             }
 
+            // Если больных больше половины, животные умирают с вероятностью 50%
             if ((*enclosureAnimal - *sickAnimal) < *sickAnimal) {
                 for (auto& animal : enclosure.animals) {
                     if (animal.state == AnimalState::SICK && rand() % 2 == 0) {
@@ -425,15 +454,15 @@ public:
         delete enclosureAnimal;
         delete sickAnimal;
 
-        // Посетители и доход
+        // Расчет посетителей и дохода
         visitors = 2 * popularity;
         wcout << L"Прибыль = " << visitors * totalAnimal - (dirtyZoo * 2) - cost << endl;
         money += visitors * totalAnimal - (dirtyZoo * 2);
 
-        // Популярность
-        popularity += (rand() % 21 - 10);
-        popularity -= totalSickAnimal;
-        popularity = max(10, min(100, popularity));
+        // Обновление популярности
+        popularity += (rand() % 21 - 10); // Случайное изменение -10..+10
+        popularity -= totalSickAnimal;    // Уменьшение из-за больных животных
+        popularity = max(10, min(100, popularity)); // Ограничение 10..100
 
         // Проверка условий победы/поражения
         if (money < 0) {
@@ -449,12 +478,14 @@ public:
         }
     }
 
+    // Метод покупки животного
     bool buyAnimal(int animalIndex) {
         if (animalIndex < 0 || animalIndex >= animals.size()) return false;
 
         Animal animal = animals[animalIndex];
         if (money < animal.price) return false;
 
+        // Попытка добавить животное в первый подходящий вольер
         for (auto& enclosure : enclosures) {
             if (enclosure.addAnimal(animal)) {
                 money -= animal.price;
@@ -465,8 +496,10 @@ public:
         return false;
     }
 
+    // Метод найма сотрудника
     bool hireWorker(WorkerRole role) {
         int salary = 0;
+        // Установка зарплаты в зависимости от должности
         switch (role) {
         case WorkerRole::VETERINAR: salary = 80; break;
         case WorkerRole::CLEANER: salary = 50; break;
@@ -476,12 +509,14 @@ public:
 
         if (money < salary) return false;
 
+        // Генерация случайного имени для сотрудника
         string names[] = { "Иван", "Мария", "Петр", "Анна", "Сергей", "Костеннов" };
         workers.emplace_back(names[rand() % 5], salary, role);
         money -= salary;
         return true;
     }
 
+    // Метод строительства вольера
     bool buildEnclosure(Climate climate, int capacity = 5) {
         int cost = capacity * 100;
         if (money < cost) return false;
@@ -491,6 +526,7 @@ public:
         return true;
     }
 
+    // Метод покупки еды
     void buyFood(int amount) {
         int cost = amount * 10;
         if (money >= cost) {
@@ -499,6 +535,7 @@ public:
         }
     }
 
+    // Метод заказа рекламы
     void advertise() {
         if (money >= 50) {
             popularity = min(100, popularity + 15);
@@ -506,17 +543,19 @@ public:
         }
     }
 
-    // Методы из второго варианта
+    // Метод обновления магазина животных
     void refreshAnimalShop() {
         animalShop.availableAnimals.clear();
-        int animalCount = min(10, 5 + (rand() % 6));
+        int animalCount = min(10, 5 + (rand() % 6)); // 5-10 животных
 
         for (int i = 0; i < animalCount; i++) {
             Animal newAnimal;
 
+            // Выбор случайного типа животного
             wstring types[] = { L"Кошачьи", L"Псовые", L"Птицы", L"Пресмыкающиеся", L"Морские" };
             newAnimal.type = types[rand() % 5];
 
+            // Генерация характеристик в зависимости от типа
             if (newAnimal.type == L"Кошачьи") {
                 wstring specificTypes[] = { L"Лев", L"Тигр", L"Леопард", L"Рысь", L"Гепард" };
                 newAnimal.specificType = specificTypes[rand() % 5];
@@ -553,15 +592,17 @@ public:
                 newAnimal.isPredator = (newAnimal.specificType == L"Акула" || newAnimal.specificType == L"Осьминог" || newAnimal.specificType == L"Дельфин");
             }
 
+            // Установка случайного климата
             wstring climates[] = { L"Тропический", L"Умеренный", L"Арктический" };
             newAnimal.climate = static_cast<Climate>(rand() % 3);
 
+            // Установка случайных характеристик
             newAnimal.age = rand() % MAX_AGE + 1;
             newAnimal.weight = rand() % 400 + 10;
             newAnimal.isSick = false;
             newAnimal.isHungry = false;
             newAnimal.isUnhappy = false;
-            newAnimal.happiness = 70 + rand() % 31;
+            newAnimal.happiness = 70 + rand() % 31; // 70-100
             newAnimal.gender = (rand() % 2 == 0) ? 'M' : 'F';
             newAnimal.price = calculateAnimalPrice(newAnimal.age, newAnimal.weight);
             newAnimal.bornInZoo = false;
@@ -569,9 +610,10 @@ public:
             animalShop.availableAnimals.push_back(newAnimal);
         }
 
-        animalShop.daysUntilRefresh = 1 + (rand() % 3);
+        animalShop.daysUntilRefresh = 1 + (rand() % 3); // 1-3 дня до обновления
     }
 
+    // Метод отображения статуса зоопарка
     void displayStatus() {
         wcout << L"\n=== Статус зоопарка ===\n";
         wcout << L"Название: " << wname << endl;
@@ -590,6 +632,7 @@ public:
         }
     }
 
+    // Метод получения целочисленного ввода с проверкой
     int getIntInput(const wstring& prompt) {
         int value;
         while (true) {
@@ -608,6 +651,7 @@ public:
         }
     }
 
+    // Метод получения булевого ввода с проверкой
     bool getBoolInput(const wstring& prompt) {
         int value;
         while (true) {
@@ -621,11 +665,13 @@ public:
         }
     }
 
+    // Метод генерации случайного имени
     wstring generateRandomName() {
         wstring names[] = { L"Анна", L"Борис", L"Виктория", L"Глеб", L"Дарья", L"Егор", L"Жанна", L"Ирина", L"Константин" };
         return names[rand() % 9];
     }
 
+    // Метод отображения списка животных
     void displayAnimalsList(const vector<Animal>& animals) {
         wcout << L"\n=== Список животных ===\n";
         if (animals.empty()) {
@@ -651,6 +697,7 @@ public:
         }
     }
 
+    // Метод отображения списка сотрудников
     void displayEmployeesList() {
         wcout << L"\n=== Список работников ===\n";
         if (workers.empty()) {
@@ -673,6 +720,7 @@ public:
         }
     }
 
+    // Метод отображения списка вольеров
     void displayEnclosuresList() {
         wcout << L"\n=== Список вольеров ===\n";
         if (enclosures.empty()) {
@@ -697,6 +745,7 @@ public:
         }
     }
 
+    // Метод отображения детальной информации о вольере
     void displayEnclosureDetails(int index) {
         if (index < 0 || index >= (int)enclosures.size()) {
             wcout << L"Некорректный номер вольера.\n";
@@ -738,6 +787,7 @@ public:
         }
     }
 
+    // Метод переименования животного
     void renameAnimal() {
         if (enclosures.empty()) {
             wcout << L"Нет вольеров с животными.\n";
@@ -778,6 +828,7 @@ public:
         wcout << L"Имя успешно изменено.\n";
     }
 
+    // Метод размножения животных
     void breedAnimals() {
         if (enclosures.empty()) {
             wcout << L"Нет вольеров с животными.\n";
@@ -798,6 +849,7 @@ public:
             return;
         }
 
+        // Проверка специального вольера для размножения
         if (enclosure.isBreedingEnclosure && !enclosure.specificAnimalType.empty()) {
             bool hasSameType = true;
             for (const auto& animal : enclosure.animals) {
@@ -840,6 +892,7 @@ public:
         }
 
         try {
+            // Попытка размножения с помощью перегруженного оператора +
             Animal offspring = animal1 + animal2;
 
             if ((int)enclosure.animals.size() >= enclosure.capacity) {
@@ -847,6 +900,7 @@ public:
                 return;
             }
 
+            // Добавление потомка в вольер
             enclosure.animals.push_back(offspring);
             animalsCount++;
             wcout << L"Родился новый " << offspring.specificType << L" по имени " << offspring.wname << endl;
@@ -857,6 +911,7 @@ public:
         }
     }
 
+    // Метод управления животными (основное меню)
     void manageAnimals() {
         hasPlayerTakenAction = true;
         int choice;
@@ -885,6 +940,7 @@ public:
 
             switch (choice) {
             case 1: {
+                // Ограничение на покупку животных после 10 дня
                 if (daysSurvived >= 10 && animalsBoughtToday >= 1) {
                     wcout << L"После 10 дня можно покупать не более 1 животного в день.\n";
                     break;
@@ -932,6 +988,7 @@ public:
 
                 Enclosure& enclosure = enclosures[enclosureIndex];
 
+                // Проверка совместимости животного и вольера
                 if (enclosure.animalType != animalToBuy.type) {
                     wcout << L"Тип вольера не подходит для этого животного.\n";
                     break;
@@ -953,6 +1010,7 @@ public:
                     break;
                 }
 
+                // Покупка животного
                 money -= animalToBuy.price;
                 food -= 1;
                 animalsCount++;
@@ -965,6 +1023,7 @@ public:
                 break;
             }
             case 2: {
+                // Продажа животного
                 if (enclosures.empty()) {
                     wcout << L"Нет вольеров.\n";
                     break;
@@ -1011,6 +1070,7 @@ public:
                 break;
             }
             case 3: {
+                // Просмотр всех животных
                 if (enclosures.empty()) {
                     wcout << L"Нет вольеров с животными.\n";
                     break;
@@ -1033,6 +1093,7 @@ public:
                 break;
             }
             case 4: {
+                // Перемещение животного между вольерами
                 if (enclosures.size() < 2) {
                     wcout << L"Необходимо минимум два вольера для перемещения животных.\n";
                     break;
@@ -1080,6 +1141,7 @@ public:
                 Animal& animalToMove = enclosures[sourceEnclosureIndex].animals[animalIndex];
                 Enclosure& destEnclosure = enclosures[destinationEnclosureIndex];
 
+                // Проверка совместимости
                 if (destEnclosure.animalType != animalToMove.type) {
                     wcout << L"Тип вольера не подходит для этого животного.\n";
                     break;
@@ -1096,6 +1158,7 @@ public:
                     break;
                 }
 
+                // Перемещение животного
                 destEnclosure.animals.push_back(animalToMove);
                 enclosures[sourceEnclosureIndex].animals.erase(enclosures[sourceEnclosureIndex].animals.begin() + animalIndex);
                 wcout << L"Животное успешно перемещено.\n";
@@ -1103,6 +1166,7 @@ public:
                 break;
             }
             case 5: {
+                // Магазин животных
                 wcout << L"\n=== Магазин животных ===\n";
                 wcout << L"До следующего обновления: " << animalShop.daysUntilRefresh << L" дней\n";
                 wcout << L"1. Просмотреть животных\n";
@@ -1133,6 +1197,7 @@ public:
                 breedAnimals();
                 break;
             case 8: {
+                // Просмотр информации о вольере
                 if (enclosures.empty()) {
                     wcout << L"Нет вольеров.\n";
                     break;
@@ -1153,6 +1218,7 @@ public:
         }
     }
 
+    // Метод управления закупками (еда и реклама)
     void managePurchases() {
         hasPlayerTakenAction = true;
         int choice;
@@ -1174,6 +1240,7 @@ public:
 
             switch (choice) {
             case 1: {
+                // Покупка еды
                 int amount = getIntInput(L"Сколько еды купить? (1 еда = " + to_wstring(BASE_FOOD_COST) + L" денег): ");
                 int cost = amount * BASE_FOOD_COST;
                 if (money >= cost) {
@@ -1187,6 +1254,7 @@ public:
                 break;
             }
             case 2: {
+                // Заказ рекламы
                 if (money >= ADVERTISEMENT_COST) {
                     money -= ADVERTISEMENT_COST;
                     popularity = min(MAX_POPULARITY, popularity + 5);
@@ -1206,6 +1274,7 @@ public:
         }
     }
 
+    // Метод управления вольерами
     void manageBuildings() {
         hasPlayerTakenAction = true;
         int choice;
@@ -1230,6 +1299,7 @@ public:
 
             switch (choice) {
             case 1: {
+                // Строительство обычного вольера
                 if (money < BASE_ENCLOSURE_COST) {
                     wcout << L"Недостаточно денег для строительства вольера.\n";
                     break;
@@ -1243,6 +1313,7 @@ public:
                 wstring climate = chooseClimate();
                 wstring animalType = chooseAnimalType();
 
+                // Определение, будет ли вольер для хищников
                 bool isPredatorEnclosure = false;
                 if (animalType == L"Кошачьи") isPredatorEnclosure = true;
                 else if (animalType == L"Псовые") isPredatorEnclosure = (rand() % 5 != 0);
@@ -1250,6 +1321,7 @@ public:
                 else if (animalType == L"Пресмыкающиеся") isPredatorEnclosure = (rand() % 2 == 0);
                 else if (animalType == L"Морские") isPredatorEnclosure = (rand() % 3 != 0);
 
+                // Создание нового вольера
                 Enclosure newEnclosure;
                 newEnclosure.name = string(enclosureName.begin(), enclosureName.end());
                 newEnclosure.capacity = 2;
@@ -1268,6 +1340,7 @@ public:
                 break;
             }
             case 2: {
+                // Строительство вольера для размножения
                 if (money < BREEDING_ENCLOSURE_COST) {
                     wcout << L"Недостаточно денег для строительства вольера для размножения.\n";
                     break;
@@ -1284,6 +1357,7 @@ public:
 
                 bool isPredatorEnclosure = isPredatorAnimal(specificType);
 
+                // Создание вольера для размножения
                 Enclosure newEnclosure;
                 newEnclosure.name = string(enclosureName.begin(), enclosureName.end());
                 newEnclosure.capacity = 3;
@@ -1303,6 +1377,7 @@ public:
                 break;
             }
             case 3: {
+                // Улучшение вольера
                 if (enclosures.empty()) {
                     wcout << L"Нет вольеров для улучшения.\n";
                     break;
@@ -1340,6 +1415,7 @@ public:
                 break;
             }
             case 4: {
+                // Продажа вольера
                 if (enclosures.empty()) {
                     wcout << L"Нет вольеров для продажи.\n";
                     break;
@@ -1359,6 +1435,7 @@ public:
                     break;
                 }
 
+                // Расчет стоимости продажи
                 int sellPrice = 300 + (enclosure.upgradeLevel - 1) * 100;
                 if (enclosure.isBreedingEnclosure) {
                     sellPrice += 200;
@@ -1378,6 +1455,7 @@ public:
                 break;
             }
             case 5: {
+                // Просмотр информации о вольере
                 if (enclosures.empty()) {
                     wcout << L"Нет вольеров.\n";
                     break;
@@ -1395,6 +1473,7 @@ public:
         }
     }
 
+    // Метод управления персоналом
     void manageEmployees() {
         hasPlayerTakenAction = true;
         int choice;
@@ -1417,6 +1496,7 @@ public:
 
             switch (choice) {
             case 1: {
+                // Наем нового сотрудника
                 if (workers.size() >= MAX_EMPLOYEES) {
                     wcout << L"Достигнуто максимальное количество сотрудников (" << MAX_EMPLOYEES << L").\n";
                     break;
@@ -1433,23 +1513,24 @@ public:
                 wcout << L"3. Смотритель (ухаживает за животными)\n";
                 int positionChoice = getIntInput(L"Ваш выбор: ");
 
+                // Создание сотрудника в зависимости от выбранной должности
                 switch (positionChoice) {
                 case 1:
                     position = L"Ветеринар";
-                    salary = 60 + rand() % 41;
-                    efficiency = 50 + rand() % 51;
+                    salary = 60 + rand() % 41; // 60-100
+                    efficiency = 50 + rand() % 51; // 50-100
                     workers.emplace_back(string(name.begin(), name.end()), salary, WorkerRole::VETERINAR);
                     break;
                 case 2:
                     position = L"Уборщик";
-                    salary = 40 + rand() % 31;
-                    efficiency = 70 + rand() % 31;
+                    salary = 40 + rand() % 31; // 40-70
+                    efficiency = 70 + rand() % 31; // 70-100
                     workers.emplace_back(string(name.begin(), name.end()), salary, WorkerRole::CLEANER);
                     break;
                 case 3:
                     position = L"Смотритель";
-                    salary = 50 + rand() % 51;
-                    efficiency = 60 + rand() % 41;
+                    salary = 50 + rand() % 51; // 50-100
+                    efficiency = 60 + rand() % 41; // 60-100
                     workers.emplace_back(string(name.begin(), name.end()), salary, WorkerRole::FOODMEN);
                     break;
                 default:
@@ -1469,6 +1550,7 @@ public:
                 break;
             }
             case 3: {
+                // Увольнение сотрудника
                 if (workers.empty()) {
                     wcout << L"Нет сотрудников для увольнения.\n";
                     break;
@@ -1503,9 +1585,11 @@ public:
         }
     }
 
+    // Метод обновления уровня счастья животных
     void updateAnimalHappiness() {
         for (auto& enclosure : enclosures) {
             for (auto& animal : enclosure.animals) {
+                // Уменьшение счастья в зависимости от состояния
                 if (animal.isHungry) {
                     animal.happiness = max(0, animal.happiness - 15);
                 }
@@ -1518,6 +1602,7 @@ public:
                     animal.happiness = max(0, animal.happiness - 10);
                 }
 
+                // Увеличение счастья, если все хорошо
                 if (!animal.isHungry && !animal.isSick && !enclosure.isDirty) {
                     animal.happiness = min(100, animal.happiness + 5);
                 }
@@ -1527,12 +1612,14 @@ public:
         }
     }
 
+    // Метод проверки старения и смерти животных
     void checkAnimalAgingAndDeath() {
         for (auto& enclosure : enclosures) {
             for (size_t i = 0; i < enclosure.animals.size(); ) {
                 Animal& animal = enclosure.animals[i];
                 animal.age++;
 
+                // Проверка на смерть от старости
                 if (animal.age > OLD_AGE_THRESHOLD) {
                     int deathChance = min(99, (animal.age - OLD_AGE_THRESHOLD) / 10);
                     if (rand() % 100 < deathChance) {
@@ -1547,6 +1634,7 @@ public:
         }
     }
 
+    // Метод проверки удовлетворенности делегации
     void checkDelegationSatisfaction() {
         bool hasMarineEnclosure = false;
         for (const auto& enclosure : enclosures) {
@@ -1575,6 +1663,7 @@ public:
         }
     }
 
+    // Главное меню игры
     void menu() {
         int choice;
         while (true) {
@@ -1622,7 +1711,7 @@ public:
     }
 };
 
-// Вспомогательные функции
+// Вспомогательная функция для проверки, является ли животное хищником
 bool isPredatorAnimal(const wstring& specificType) {
     if (specificType == L"Лев" || specificType == L"Тигр" || specificType == L"Леопард" ||
         specificType == L"Рысь" || specificType == L"Гепард" ||
@@ -1636,6 +1725,7 @@ bool isPredatorAnimal(const wstring& specificType) {
     return false;
 }
 
+// Функция выбора климата через меню
 wstring chooseClimate() {
     int choice;
     while (true) {
@@ -1666,6 +1756,7 @@ wstring chooseClimate() {
     }
 }
 
+// Функция выбора типа животного через меню
 wstring chooseAnimalType() {
     int choice;
     while (true) {
@@ -1702,6 +1793,7 @@ wstring chooseAnimalType() {
     }
 }
 
+// Функция выбора конкретного вида животного через меню
 wstring chooseSpecificAnimal(const wstring& type) {
     if (type == L"Кошачьи") {
         int choice;
@@ -1806,6 +1898,7 @@ wstring chooseSpecificAnimal(const wstring& type) {
     return L"";
 }
 
+// Функция расчета цены животного на основе возраста и веса
 int calculateAnimalPrice(int age, int weight) {
     double ageFactor = max(0.0, 1.0 - (double)age / MAX_AGE);
     double weightFactor = max(0.0, 1.0 - (double)weight / 500.0);
@@ -1813,6 +1906,7 @@ int calculateAnimalPrice(int age, int weight) {
     return max(price, 100);
 }
 
+// Функция отображения информации о вольере
 void displayEnclosureInfo(int index, const vector<Enclosure>& enclosures) {
     if (index >= 0 && index < (int)enclosures.size()) {
         wcout << L"  Вольер " << index << L": " << enclosures[index].name.c_str() << endl;
@@ -1844,6 +1938,7 @@ void displayEnclosureInfo(int index, const vector<Enclosure>& enclosures) {
     }
 }
 
+// Функция отображения сообщения о делегации
 void displayDelegationMessage(bool initial) {
     if (initial) {
         wcout << L"\nВ ваш зоопарк прибыла делегация с Суперземли TOI-1452 b!\n";
@@ -1854,11 +1949,13 @@ void displayDelegationMessage(bool initial) {
     }
 }
 
+// Функция удаления не-русских символов из строки
 wstring removeNonRussian(const wstring& text) {
     wregex re(L"[^а-яА-ЯёЁ\\s]");
     return regex_replace(text, re, L"");
 }
 
+// Функция локализации текста (замены непонятных символов)
 wstring localizeText(const wstring& text) {
     unordered_map<wstring, wstring> localizationMap = {
         {L"т√їюф", L"привет"},
@@ -1877,6 +1974,7 @@ wstring localizeText(const wstring& text) {
     return result;
 }
 
+// Функция удаления лишних пробелов из строки
 wstring removeExtraSpaces(const wstring& text) {
     wstring result = text;
     result.erase(unique(result.begin(), result.end(), [](wchar_t a, wchar_t b) {
@@ -1892,24 +1990,30 @@ wstring removeExtraSpaces(const wstring& text) {
     return result;
 }
 
+// Главная функция программы
 int wmain(int argc, wchar_t* argv[]) {
+    // Настройка консоли для поддержки Unicode
     _setmode(_fileno(stdout), _O_U16TEXT);
     _setmode(_fileno(stdin), _O_U16TEXT);
     _setmode(_fileno(stderr), _O_U16TEXT);
 
+    // Инициализация генератора случайных чисел
     srand((unsigned int)time(nullptr));
 
+    // Приветствие и ввод названия зоопарка
     wcout << L"\n=== Зоопарк Менеджер ===\n";
     wcout << L"Введите название зоопарка: ";
 
     wstring name;
     getline(wcin >> ws, name);
 
+    // Обработка пустого названия
     if (name.empty()) {
         wcout << L"Название зоопарка не может быть пустым. Используется название 'Мой Зоопарк'." << endl;
         name = L"Мой Зоопарк";
     }
 
+    // Очистка и нормализация названия
     wstring cleanedName = removeNonRussian(name);
     wstring localizedName = localizeText(cleanedName);
     wstring finalName = removeExtraSpaces(localizedName);
@@ -1918,8 +2022,8 @@ int wmain(int argc, wchar_t* argv[]) {
         finalName = L"Мой Зоопарк";
     }
 
+    // Создание зоопарка и запуск игры
     Zoo zoo(finalName);
-
     displayDelegationMessage(true);
     zoo.menu();
 
